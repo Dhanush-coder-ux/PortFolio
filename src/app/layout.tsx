@@ -2,15 +2,15 @@ import type { Metadata, Viewport } from "next";
 import "../index.css";
 
 export const metadata: Metadata = {
-  title: "Dhanush Kumar | AI Engineer Portfolio",
+  title: "Dhanush Kumar | Full-Stack & AI Systems Engineer",
   description:
-    "Project Blackhole: a premium AI engineer portfolio for Dhanush Kumar, focused on Agentic RAG, FastAPI, React, and production systems.",
+    "Portfolio of Dhanush Kumar — Computer Science Engineer building full-stack applications, Agentic RAG pipelines, FastAPI backends, and responsive React interfaces.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#030305",
+  themeColor: "#080909",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
