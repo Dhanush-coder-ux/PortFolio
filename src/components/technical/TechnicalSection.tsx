@@ -38,7 +38,7 @@ export default function TechnicalSection() {
       if (!isDesktop) return;
 
       const track = trackRef.current;
-      const getScrollDist = () => Math.max(0, track.scrollWidth - window.innerWidth + 140);
+      const getScrollDist = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
       // Main Horizontal Card Track Tween
       const horizontalTween = gsap.to(track, {
@@ -75,6 +75,7 @@ export default function TechnicalSection() {
       });
 
       return () => {
+        horizontalTween.scrollTrigger?.kill();
         horizontalTween.kill();
       };
     },
@@ -85,7 +86,7 @@ export default function TechnicalSection() {
     <section
       id="technical"
       ref={sectionRef}
-      className="relative bg-[#080808] text-[#F5F2E9] overflow-hidden border-t border-[#1F2220]"
+      className="relative bg-[#080909] text-[#F5F2E9] overflow-hidden md:min-h-screen flex flex-col justify-between"
     >
       {/* Subtle Studio Ambient Lighting */}
       <div
@@ -106,30 +107,30 @@ export default function TechnicalSection() {
         EDITORIAL SECTION HEADER (PINNED AT TOP DURING HORIZONTAL SCROLL)
         ========================================================================
       */}
-      <div className="pt-20 sm:pt-24 pb-8 sm:pb-12 px-6 sm:px-10 md:pl-36 md:pr-12 lg:pl-48 lg:pr-16 max-w-[1440px] mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-3 max-w-2xl">
+      <div className="pt-16 sm:pt-20 lg:pt-22 pb-4 sm:pb-6 px-6 sm:px-10 md:pl-48 md:pr-12 lg:pl-64 lg:pr-16 max-w-[1440px] w-full mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
+        <div className="space-y-2 sm:space-y-3 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#121413] border border-[#262A28] text-xs font-mono-tech text-[#E8B95C]">
             <Terminal className="w-3.5 h-3.5" />
             <span>03 // TECHNICAL EXPERTISE &bull; EDITORIAL CATALOG</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-poster uppercase tracking-tight text-[#F5F2E9] leading-none">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-poster uppercase tracking-tight text-[#F5F2E9] leading-none">
             ENGINEERING DISCIPLINES
           </h2>
 
-          <p className="text-sm sm:text-base text-[#9A9C96] leading-relaxed font-light">
+          <p className="text-xs sm:text-sm text-[#9A9C96] leading-relaxed font-light max-w-xl">
             Six focused technical verticals applied across distributed architectures, local inference RAG pipelines, and high-performance client systems.
           </p>
         </div>
 
         {/* Horizontal Scroll Indicator & Progress Bar */}
-        <div className="hidden md:flex flex-col items-end gap-2 text-xs font-mono-tech text-[#8A8C86]">
-          <div className="flex items-center gap-2 tracking-wider uppercase">
+        <div className="hidden md:flex flex-col items-end gap-2 text-xs font-mono-tech text-[#8A8C86] shrink-0">
+          <div className="flex items-center gap-2 tracking-wider uppercase text-[11px]">
             <span>Scroll To Inspect Specs</span>
-            <ArrowRight className="w-4 h-4 text-[#E8B95C] animate-pulse" />
+            <ArrowRight className="w-3.5 h-3.5 text-[#E8B95C] animate-pulse" />
           </div>
 
-          <div className="w-44 h-1.5 rounded-full bg-[#1A1D1B] overflow-hidden border border-[#282C2A]">
+          <div className="w-40 h-1.5 rounded-full bg-[#1A1D1B] overflow-hidden border border-[#282C2A]">
             <div
               ref={progressBarRef}
               className="h-full bg-[#E8B95C] transition-all duration-75"
@@ -148,7 +149,7 @@ export default function TechnicalSection() {
       */}
       <div
         ref={trackRef}
-        className="flex gap-6 sm:gap-8 lg:gap-10 pb-20 sm:pb-24 px-6 sm:px-10 md:pl-36 md:pr-16 lg:pl-48 lg:pr-24 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory md:snap-none scrollbar-none"
+        className="flex gap-6 sm:gap-8 lg:gap-10 pb-10 sm:pb-14 lg:pb-16 px-6 sm:px-10 md:pl-48 md:pr-16 lg:pl-64 lg:pr-24 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory md:snap-none scrollbar-none items-stretch my-auto"
       >
         {/* 
           ----------------------------------------------------------------------
@@ -157,7 +158,7 @@ export default function TechnicalSection() {
           Surface: Warm ash-white (#DAD9D2)
           ----------------------------------------------------------------------
         */}
-        <article className="tech-card w-[88vw] sm:w-[540px] lg:w-[620px] h-[580px] sm:h-[610px] flex-shrink-0 snap-center rounded-md bg-[#DAD9D2] text-[#171715] border border-[#171715]/20 p-7 sm:p-9 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
+        <article className="tech-card w-[86vw] sm:w-[480px] md:w-[500px] lg:w-[580px] h-[520px] sm:h-[540px] md:h-[min(540px,calc(100vh-210px))] min-h-[460px] flex-shrink-0 snap-center rounded-md bg-[#DAD9D2] text-[#171715] border border-[#171715]/20 p-6 sm:p-7 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
           {/* Subtle Paper Grain Overlay */}
           <div className="absolute inset-0 paper-grain pointer-events-none opacity-40" />
 
@@ -165,12 +166,12 @@ export default function TechnicalSection() {
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 via-black/5 to-transparent pointer-events-none" />
 
           {/* Massive Distressed Background Watermark "01" */}
-          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[190px] sm:text-[230px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
+          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[170px] sm:text-[200px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
             01
           </div>
 
           {/* Top Metadata Header */}
-          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-4">
+          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-3 sm:pb-3.5">
             <div className="space-y-0.5">
               <span className="font-mono-tech text-[10px] uppercase tracking-widest text-[#555550] block">
                 DISCIPLINE // SPEC NO. 01
@@ -186,18 +187,18 @@ export default function TechnicalSection() {
           </div>
 
           {/* Main Typography Statement */}
-          <div className="relative z-10 my-auto space-y-4 pt-2">
-            <h3 className="font-poster text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-[#171715] leading-[0.92]">
+          <div className="relative z-10 my-auto space-y-3 pt-1">
+            <h3 className="font-poster text-3xl sm:text-4xl lg:text-[40px] uppercase tracking-tight text-[#171715] leading-[0.94]">
               AI ENGINEERING <br />
               <span className="text-[#555550]">&amp; AGENTIC RAG</span>
             </h3>
 
-            <p className="font-display text-xs sm:text-sm text-[#40403B] leading-relaxed max-w-lg font-medium">
+            <p className="font-display text-xs sm:text-[13px] text-[#40403B] leading-relaxed max-w-lg font-medium">
               Architecting production-ready Retrieval-Augmented Generation pipelines: document ingestion, overlap chunking, dense semantic embeddings, hybrid vector search, and local inference runners that eliminate recurring API token expenditures.
             </p>
 
             {/* Architecture Dataflow Stencil Graphic */}
-            <div className="p-3 bg-[#C7C6BE]/60 border border-[#171715]/15 rounded-sm space-y-1.5 font-mono-tech text-[10.5px] text-[#22221F]">
+            <div className="p-2.5 sm:p-3 bg-[#C7C6BE]/60 border border-[#171715]/15 rounded-sm space-y-1 font-mono-tech text-[10px] text-[#22221F]">
               <div className="text-[9px] uppercase tracking-wider text-[#666660] font-bold">
                 DATAFLOW PIPELINE PROTOCOL
               </div>
@@ -214,11 +215,11 @@ export default function TechnicalSection() {
           </div>
 
           {/* Bottom Technical Tag Cloud */}
-          <div className="relative z-10 pt-4 border-t border-[#171715]/20 space-y-2">
-            <div className="font-mono-tech text-[9.5px] tracking-wider text-[#555550] uppercase">
+          <div className="relative z-10 pt-3 border-t border-[#171715]/20 space-y-1.5">
+            <div className="font-mono-tech text-[9px] tracking-wider text-[#555550] uppercase">
               TECHNOLOGY MATRIX
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
               {[
                 "LangGraph",
                 "Agentic RAG",
@@ -230,7 +231,7 @@ export default function TechnicalSection() {
               ].map((tech) => (
                 <span
                   key={tech}
-                  className="px-2.5 py-1 rounded-sm bg-[#C7C6BE]/80 border border-[#171715]/25 font-mono-tech text-xs font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
+                  className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-sm bg-[#C7C6BE]/80 border border-[#171715]/25 font-mono-tech text-[11px] font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
                 >
                   {tech}
                 </span>
@@ -246,17 +247,17 @@ export default function TechnicalSection() {
           Surface: Dusty warm grey (#C7C6BE)
           ----------------------------------------------------------------------
         */}
-        <article className="tech-card w-[88vw] sm:w-[540px] lg:w-[620px] h-[580px] sm:h-[610px] flex-shrink-0 snap-center rounded-md bg-[#C7C6BE] text-[#171715] border border-[#171715]/25 p-7 sm:p-9 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
+        <article className="tech-card w-[86vw] sm:w-[480px] md:w-[500px] lg:w-[580px] h-[520px] sm:h-[540px] md:h-[min(540px,calc(100vh-210px))] min-h-[460px] flex-shrink-0 snap-center rounded-md bg-[#C7C6BE] text-[#171715] border border-[#171715]/25 p-6 sm:p-7 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
           <div className="absolute inset-0 paper-grain pointer-events-none opacity-40" />
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 via-black/5 to-transparent pointer-events-none" />
 
           {/* Watermark "02" */}
-          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[190px] sm:text-[230px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
+          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[170px] sm:text-[200px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
             02
           </div>
 
           {/* Header */}
-          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-4">
+          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-3 sm:pb-3.5">
             <div className="space-y-0.5">
               <span className="font-mono-tech text-[10px] uppercase tracking-widest text-[#555550] block">
                 DISCIPLINE // SPEC NO. 02
@@ -273,18 +274,18 @@ export default function TechnicalSection() {
           </div>
 
           {/* Title & UNIX Spec Block */}
-          <div className="relative z-10 my-auto space-y-4 pt-2">
-            <h3 className="font-poster text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-[#171715] leading-[0.92]">
+          <div className="relative z-10 my-auto space-y-3 pt-1">
+            <h3 className="font-poster text-3xl sm:text-4xl lg:text-[40px] uppercase tracking-tight text-[#171715] leading-[0.94]">
               BACKEND &amp; <br />
               <span className="text-[#555550]">SYSTEMS DESIGN</span>
             </h3>
 
-            <p className="font-display text-xs sm:text-sm text-[#383833] leading-relaxed max-w-lg font-medium">
+            <p className="font-display text-xs sm:text-[13px] text-[#383833] leading-relaxed max-w-lg font-medium">
               Developing resilient asynchronous microservices with strict schema validation, role-based JWT authorization, background queue workers for non-blocking I/O, and structured PostgreSQL models.
             </p>
 
             {/* Terminal Ledger / Architecture Trace */}
-            <div className="p-3 bg-[#DAD9D2] border border-[#171715]/20 rounded-sm font-mono-tech text-[10px] space-y-1 text-[#171715]">
+            <div className="p-2.5 sm:p-3 bg-[#DAD9D2] border border-[#171715]/20 rounded-sm font-mono-tech text-[10px] space-y-1 text-[#171715]">
               <div className="flex items-center justify-between text-[#666660] pb-1 border-b border-[#171715]/10 text-[9px]">
                 <span>ENDPOINT RUNTIME: FASTAPI ASYNC</span>
                 <span>STATUS: 202 ACCEPTED</span>
@@ -302,12 +303,12 @@ export default function TechnicalSection() {
           </div>
 
           {/* Bottom Tags & Barcode Decorator */}
-          <div className="relative z-10 pt-4 border-t border-[#171715]/20 space-y-2">
-            <div className="flex items-center justify-between font-mono-tech text-[9.5px] text-[#555550] uppercase">
+          <div className="relative z-10 pt-3 border-t border-[#171715]/20 space-y-1.5">
+            <div className="flex items-center justify-between font-mono-tech text-[9px] text-[#555550] uppercase">
               <span>STACK INVENTORY</span>
               <span>BARCODE // 7729-SYS</span>
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
               {[
                 "Python 3.12",
                 "FastAPI",
@@ -320,7 +321,7 @@ export default function TechnicalSection() {
               ].map((tech) => (
                 <span
                   key={tech}
-                  className="px-2.5 py-1 rounded-sm bg-[#DAD9D2] border border-[#171715]/25 font-mono-tech text-xs font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
+                  className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-sm bg-[#DAD9D2] border border-[#171715]/25 font-mono-tech text-[11px] font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
                 >
                   {tech}
                 </span>
@@ -336,17 +337,17 @@ export default function TechnicalSection() {
           Surface: Dark card variation (#252522)
           ----------------------------------------------------------------------
         */}
-        <article className="tech-card w-[88vw] sm:w-[540px] lg:w-[620px] h-[580px] sm:h-[610px] flex-shrink-0 snap-center rounded-md bg-[#252522] text-[#F2F0E6] border border-[#3D3D36] p-7 sm:p-9 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.95),0_10px_30px_rgba(0,0,0,0.8)] relative overflow-hidden select-none group">
+        <article className="tech-card w-[86vw] sm:w-[480px] md:w-[500px] lg:w-[580px] h-[520px] sm:h-[540px] md:h-[min(540px,calc(100vh-210px))] min-h-[460px] flex-shrink-0 snap-center rounded-md bg-[#252522] text-[#F2F0E6] border border-[#3D3D36] p-6 sm:p-7 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.95),0_10px_30px_rgba(0,0,0,0.8)] relative overflow-hidden select-none group">
           <div className="absolute inset-0 paper-grain-dark pointer-events-none opacity-40" />
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
 
           {/* Watermark "03" in Wireframe Gold Accent */}
-          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[190px] sm:text-[230px] text-[#E8B95C]/[0.05] leading-none pointer-events-none select-none">
+          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[170px] sm:text-[200px] text-[#E8B95C]/[0.05] leading-none pointer-events-none select-none">
             03
           </div>
 
           {/* Header */}
-          <div className="relative z-10 flex items-start justify-between border-b border-[#3D3D36] pb-4">
+          <div className="relative z-10 flex items-start justify-between border-b border-[#3D3D36] pb-3 sm:pb-3.5">
             <div className="space-y-0.5">
               <span className="font-mono-tech text-[10px] uppercase tracking-widest text-[#8A8980] block">
                 DISCIPLINE // SPEC NO. 03
@@ -362,18 +363,18 @@ export default function TechnicalSection() {
           </div>
 
           {/* Title & Archival Database Grid */}
-          <div className="relative z-10 my-auto space-y-4 pt-2">
-            <h3 className="font-poster text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-[#F2F0E6] leading-[0.92]">
+          <div className="relative z-10 my-auto space-y-3 pt-1">
+            <h3 className="font-poster text-3xl sm:text-4xl lg:text-[40px] uppercase tracking-tight text-[#F2F0E6] leading-[0.94]">
               DATABASE <br />
               <span className="text-[#8A8980]">ENGINEERING</span>
             </h3>
 
-            <p className="font-display text-xs sm:text-sm text-[#B5B3A8] leading-relaxed max-w-lg font-light">
+            <p className="font-display text-xs sm:text-[13px] text-[#B5B3A8] leading-relaxed max-w-lg font-light">
               Relational schema modeling with normalized foreign keys, ACID compliance, Redis session caching, and pgvector cosine distance indices for high-dimensional vector search.
             </p>
 
             {/* Archival Store Blueprint Table */}
-            <div className="p-3 bg-[#1B1B18] border border-[#3A3A34] rounded-sm font-mono-tech text-[10px] space-y-1.5 text-[#DAD9D2]">
+            <div className="p-2.5 sm:p-3 bg-[#1B1B18] border border-[#3A3A34] rounded-sm font-mono-tech text-[10px] space-y-1 text-[#DAD9D2]">
               <div className="flex items-center justify-between text-[#8A8980] text-[9px] border-b border-[#2C2C27] pb-1">
                 <span>STORE ARCHITECTURE</span>
                 <span>INDEXING ALGORITHM</span>
@@ -394,11 +395,11 @@ export default function TechnicalSection() {
           </div>
 
           {/* Bottom Tags */}
-          <div className="relative z-10 pt-4 border-t border-[#3D3D36] space-y-2">
-            <div className="font-mono-tech text-[9.5px] tracking-wider text-[#8A8980] uppercase">
+          <div className="relative z-10 pt-3 border-t border-[#3D3D36] space-y-1.5">
+            <div className="font-mono-tech text-[9px] tracking-wider text-[#8A8980] uppercase">
               DATA ENGINE STACK
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
               {[
                 "PostgreSQL",
                 "pgvector",
@@ -410,7 +411,7 @@ export default function TechnicalSection() {
               ].map((tech) => (
                 <span
                   key={tech}
-                  className="px-2.5 py-1 rounded-sm bg-[#1A1A17] border border-[#3D3D36] font-mono-tech text-xs font-bold text-[#F2F0E6] tracking-tight hover:border-[#E8B95C] transition-colors"
+                  className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-sm bg-[#1A1A17] border border-[#3D3D36] font-mono-tech text-[11px] font-bold text-[#F2F0E6] tracking-tight hover:border-[#E8B95C] transition-colors"
                 >
                   {tech}
                 </span>
@@ -426,17 +427,17 @@ export default function TechnicalSection() {
           Surface: Warm ash-white (#DAD9D2)
           ----------------------------------------------------------------------
         */}
-        <article className="tech-card w-[88vw] sm:w-[540px] lg:w-[620px] h-[580px] sm:h-[610px] flex-shrink-0 snap-center rounded-md bg-[#DAD9D2] text-[#171715] border border-[#171715]/20 p-7 sm:p-9 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
+        <article className="tech-card w-[86vw] sm:w-[480px] md:w-[500px] lg:w-[580px] h-[520px] sm:h-[540px] md:h-[min(540px,calc(100vh-210px))] min-h-[460px] flex-shrink-0 snap-center rounded-md bg-[#DAD9D2] text-[#171715] border border-[#171715]/20 p-6 sm:p-7 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
           <div className="absolute inset-0 paper-grain pointer-events-none opacity-40" />
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 via-black/5 to-transparent pointer-events-none" />
 
           {/* Watermark "04" */}
-          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[190px] sm:text-[230px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
+          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[170px] sm:text-[200px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
             04
           </div>
 
           {/* Header */}
-          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-4">
+          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-3 sm:pb-3.5">
             <div className="space-y-0.5">
               <span className="font-mono-tech text-[10px] uppercase tracking-widest text-[#555550] block">
                 DISCIPLINE // SPEC NO. 04
@@ -454,23 +455,23 @@ export default function TechnicalSection() {
           </div>
 
           {/* Title & Streetwear Editorial Layout */}
-          <div className="relative z-10 my-auto space-y-4 pt-2">
-            <h3 className="font-poster text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-[#171715] leading-[0.92]">
+          <div className="relative z-10 my-auto space-y-3 pt-1">
+            <h3 className="font-poster text-3xl sm:text-4xl lg:text-[40px] uppercase tracking-tight text-[#171715] leading-[0.94]">
               FRONTEND &amp; <br />
               <span className="text-[#555550]">INTERACTION</span>
             </h3>
 
-            <p className="font-display text-xs sm:text-sm text-[#40403B] leading-relaxed max-w-lg font-medium">
+            <p className="font-display text-xs sm:text-[13px] text-[#40403B] leading-relaxed max-w-lg font-medium">
               Developing high-speed, accessible user interfaces with strict TypeScript contracts, fluid mathematical clamp typography, responsive SVG graphics, and hardware-accelerated GSAP ScrollTrigger motion.
             </p>
 
             {/* Specimen Principles Block */}
             <div className="grid grid-cols-2 gap-2 font-mono-tech text-[10px]">
-              <div className="p-2.5 bg-[#C7C6BE]/70 border border-[#171715]/15 rounded-sm">
+              <div className="p-2 sm:p-2.5 bg-[#C7C6BE]/70 border border-[#171715]/15 rounded-sm">
                 <span className="text-[#666660] block text-[9px] uppercase">PRINCIPLE 01</span>
                 <span className="font-bold text-[#171715]">HARDWARE ACCELERATION</span>
               </div>
-              <div className="p-2.5 bg-[#C7C6BE]/70 border border-[#171715]/15 rounded-sm">
+              <div className="p-2 sm:p-2.5 bg-[#C7C6BE]/70 border border-[#171715]/15 rounded-sm">
                 <span className="text-[#666660] block text-[9px] uppercase">PRINCIPLE 02</span>
                 <span className="font-bold text-[#171715]">FLUID MATHEMATICAL CLAMP</span>
               </div>
@@ -478,11 +479,11 @@ export default function TechnicalSection() {
           </div>
 
           {/* Bottom Tags */}
-          <div className="relative z-10 pt-4 border-t border-[#171715]/20 space-y-2">
-            <div className="font-mono-tech text-[9.5px] tracking-wider text-[#555550] uppercase">
+          <div className="relative z-10 pt-3 border-t border-[#171715]/20 space-y-1.5">
+            <div className="font-mono-tech text-[9px] tracking-wider text-[#555550] uppercase">
               INTERACTION ENGINE
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
               {[
                 "React",
                 "TypeScript",
@@ -493,7 +494,7 @@ export default function TechnicalSection() {
               ].map((tech) => (
                 <span
                   key={tech}
-                  className="px-2.5 py-1 rounded-sm bg-[#C7C6BE]/80 border border-[#171715]/25 font-mono-tech text-xs font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
+                  className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-sm bg-[#C7C6BE]/80 border border-[#171715]/25 font-mono-tech text-[11px] font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
                 >
                   {tech}
                 </span>
@@ -509,17 +510,17 @@ export default function TechnicalSection() {
           Surface: Dusty grey (#C7C6BE)
           ----------------------------------------------------------------------
         */}
-        <article className="tech-card w-[88vw] sm:w-[540px] lg:w-[620px] h-[580px] sm:h-[610px] flex-shrink-0 snap-center rounded-md bg-[#C7C6BE] text-[#171715] border border-[#171715]/25 p-7 sm:p-9 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
+        <article className="tech-card w-[86vw] sm:w-[480px] md:w-[500px] lg:w-[580px] h-[520px] sm:h-[540px] md:h-[min(540px,calc(100vh-210px))] min-h-[460px] flex-shrink-0 snap-center rounded-md bg-[#C7C6BE] text-[#171715] border border-[#171715]/25 p-6 sm:p-7 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
           <div className="absolute inset-0 paper-grain pointer-events-none opacity-40" />
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 via-black/5 to-transparent pointer-events-none" />
 
           {/* Watermark "05" */}
-          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[190px] sm:text-[230px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
+          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[170px] sm:text-[200px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
             05
           </div>
 
           {/* Header */}
-          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-4">
+          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-3 sm:pb-3.5">
             <div className="space-y-0.5">
               <span className="font-mono-tech text-[10px] uppercase tracking-widest text-[#555550] block">
                 DISCIPLINE // SPEC NO. 05
@@ -535,18 +536,18 @@ export default function TechnicalSection() {
           </div>
 
           {/* Title & Industrial Manifest Table */}
-          <div className="relative z-10 my-auto space-y-4 pt-2">
-            <h3 className="font-poster text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-[#171715] leading-[0.92]">
+          <div className="relative z-10 my-auto space-y-3 pt-1">
+            <h3 className="font-poster text-3xl sm:text-4xl lg:text-[40px] uppercase tracking-tight text-[#171715] leading-[0.94]">
               DEVOPS &amp; <br />
               <span className="text-[#555550]">INFRASTRUCTURE</span>
             </h3>
 
-            <p className="font-display text-xs sm:text-sm text-[#383833] leading-relaxed max-w-lg font-medium">
+            <p className="font-display text-xs sm:text-[13px] text-[#383833] leading-relaxed max-w-lg font-medium">
               Creating containerized multi-stage Docker builds, automated GitHub Actions CI/CD workflows, reverse proxy configurations, and Linux server provisioning for reproducible software delivery.
             </p>
 
             {/* Manifest Specifications Table */}
-            <div className="p-3 bg-[#DAD9D2] border border-[#171715]/20 rounded-sm font-mono-tech text-[10px] space-y-1.5 text-[#171715]">
+            <div className="p-2.5 sm:p-3 bg-[#DAD9D2] border border-[#171715]/20 rounded-sm font-mono-tech text-[10px] space-y-1 text-[#171715]">
               <div className="flex items-center justify-between border-b border-[#171715]/10 pb-1 text-[9px] text-[#666660]">
                 <span>MANIFEST RECORD</span>
                 <span>SPECIFICATION TARGET</span>
@@ -567,11 +568,11 @@ export default function TechnicalSection() {
           </div>
 
           {/* Bottom Tags */}
-          <div className="relative z-10 pt-4 border-t border-[#171715]/20 space-y-2">
-            <div className="font-mono-tech text-[9.5px] tracking-wider text-[#555550] uppercase">
+          <div className="relative z-10 pt-3 border-t border-[#171715]/20 space-y-1.5">
+            <div className="font-mono-tech text-[9px] tracking-wider text-[#555550] uppercase">
               DEPLOYMENT SUITE
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
               {[
                 "Linux (Ubuntu)",
                 "Docker",
@@ -582,7 +583,7 @@ export default function TechnicalSection() {
               ].map((tech) => (
                 <span
                   key={tech}
-                  className="px-2.5 py-1 rounded-sm bg-[#DAD9D2] border border-[#171715]/25 font-mono-tech text-xs font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
+                  className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-sm bg-[#DAD9D2] border border-[#171715]/25 font-mono-tech text-[11px] font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
                 >
                   {tech}
                 </span>
@@ -598,17 +599,17 @@ export default function TechnicalSection() {
           Surface: Warm ash-white with cobalt highlights (#DAD9D2)
           ----------------------------------------------------------------------
         */}
-        <article className="tech-card w-[88vw] sm:w-[540px] lg:w-[620px] h-[580px] sm:h-[610px] flex-shrink-0 snap-center rounded-md bg-[#DAD9D2] text-[#171715] border border-[#171715]/20 p-7 sm:p-9 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
+        <article className="tech-card w-[86vw] sm:w-[480px] md:w-[500px] lg:w-[580px] h-[520px] sm:h-[540px] md:h-[min(540px,calc(100vh-210px))] min-h-[460px] flex-shrink-0 snap-center rounded-md bg-[#DAD9D2] text-[#171715] border border-[#171715]/20 p-6 sm:p-7 flex flex-col justify-between shadow-[0_30px_90px_rgba(0,0,0,0.85),0_10px_30px_rgba(0,0,0,0.6)] relative overflow-hidden select-none group">
           <div className="absolute inset-0 paper-grain pointer-events-none opacity-40" />
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 via-black/5 to-transparent pointer-events-none" />
 
           {/* Watermark "06" */}
-          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[190px] sm:text-[230px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
+          <div className="editorial-watermark absolute -right-6 -bottom-10 font-poster text-[170px] sm:text-[200px] text-[#171715]/[0.06] leading-none pointer-events-none select-none">
             06
           </div>
 
           {/* Header */}
-          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-4">
+          <div className="relative z-10 flex items-start justify-between border-b border-[#171715]/20 pb-3 sm:pb-3.5">
             <div className="space-y-0.5">
               <span className="font-mono-tech text-[10px] uppercase tracking-widest text-[#555550] block">
                 DISCIPLINE // SPEC NO. 06
@@ -625,18 +626,18 @@ export default function TechnicalSection() {
           </div>
 
           {/* Title & Telecommunications Spec Block */}
-          <div className="relative z-10 my-auto space-y-4 pt-2">
-            <h3 className="font-poster text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tight text-[#171715] leading-[0.92]">
+          <div className="relative z-10 my-auto space-y-3 pt-1">
+            <h3 className="font-poster text-3xl sm:text-4xl lg:text-[40px] uppercase tracking-tight text-[#171715] leading-[0.94]">
               NETWORKING &amp; <br />
               <span className="text-[#555550]">INFRA SECURITY</span>
             </h3>
 
-            <p className="font-display text-xs sm:text-sm text-[#40403B] leading-relaxed max-w-lg font-medium">
+            <p className="font-display text-xs sm:text-[13px] text-[#40403B] leading-relaxed max-w-lg font-medium">
               Rigorous understanding of layered network protocols (TCP/IP), IP subnetting, VLAN isolation, firewall Access Control Lists (ACLs), DHCP/DNS resolution, and modern cryptographic authentication.
             </p>
 
             {/* Packet Inspection Trace Graphic */}
-            <div className="p-3 bg-[#C7C6BE]/60 border border-[#171715]/15 rounded-sm font-mono-tech text-[10px] space-y-1.5 text-[#171715]">
+            <div className="p-2.5 sm:p-3 bg-[#C7C6BE]/60 border border-[#171715]/15 rounded-sm font-mono-tech text-[10px] space-y-1 text-[#171715]">
               <div className="text-[9px] uppercase tracking-wider text-[#666660] font-bold flex justify-between">
                 <span>PACKET INSPECTION &bull; OSI LAYER 2-4</span>
                 <span className="text-[#2842C8]">POLICY: PERMIT</span>
@@ -651,11 +652,11 @@ export default function TechnicalSection() {
           </div>
 
           {/* Bottom Tags */}
-          <div className="relative z-10 pt-4 border-t border-[#171715]/20 space-y-2">
-            <div className="font-mono-tech text-[9.5px] tracking-wider text-[#555550] uppercase">
+          <div className="relative z-10 pt-3 border-t border-[#171715]/20 space-y-1.5">
+            <div className="font-mono-tech text-[9px] tracking-wider text-[#555550] uppercase">
               NETWORK PROTOCOL SUITE
             </div>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
               {[
                 "TCP/IP",
                 "VLANs",
@@ -667,7 +668,7 @@ export default function TechnicalSection() {
               ].map((tech) => (
                 <span
                   key={tech}
-                  className="px-2.5 py-1 rounded-sm bg-[#C7C6BE]/80 border border-[#171715]/25 font-mono-tech text-xs font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
+                  className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-sm bg-[#C7C6BE]/80 border border-[#171715]/25 font-mono-tech text-[11px] font-bold text-[#171715] tracking-tight hover:bg-[#171715] hover:text-[#DAD9D2] transition-colors"
                 >
                   {tech}
                 </span>

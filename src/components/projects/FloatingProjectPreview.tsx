@@ -38,8 +38,16 @@ export default function FloatingProjectPreview({
       pos.current.y += (pos.current.targetY - pos.current.y) * lerp;
 
       if (containerRef.current) {
-        // Center the preview directly around the cursor with slight lag
-        containerRef.current.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0) translate(-50%, -50%)`;
+        // Smart offset: display preview to the right of the cursor so underlying text remains completely visible.
+        // If cursor approaches the right viewport boundary, flip preview to the left of the cursor.
+        const previewWidth = 380;
+        const isNearRightEdge = pos.current.x > window.innerWidth - (previewWidth + 60);
+        const offsetX = isNearRightEdge ? -(previewWidth + 28) : 28;
+        
+        // Clamp vertical position so preview stays comfortably within the viewport
+        const clampedY = Math.max(130, Math.min(window.innerHeight - 130, pos.current.y));
+
+        containerRef.current.style.transform = `translate3d(${Math.round(pos.current.x + offsetX)}px, ${Math.round(clampedY)}px, 0) translateY(-50%)`;
       }
 
       rafId.current = requestAnimationFrame(tick);
@@ -56,7 +64,7 @@ export default function FloatingProjectPreview({
   return (
     <div
       ref={containerRef}
-      className="fixed top-0 left-0 pointer-events-none z-50 hidden md:block will-change-transform"
+      className="fixed top-0 left-0 pointer-events-none z-40 hidden md:block will-change-transform"
       style={{
         opacity: isVisible && activeIndex !== null ? 1 : 0,
         transform: "translate3d(-500px, -500px, 0)",
@@ -65,7 +73,7 @@ export default function FloatingProjectPreview({
       }}
     >
       {/* Floating Image Preview Container with Elegant Aspect Ratio */}
-      <div className="relative w-[340px] sm:w-[420px] aspect-[16/10] rounded-2xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35),0_0_0_1px_rgba(0,0,0,0.08)] bg-neutral-900">
+      <div className="relative w-[320px] sm:w-[380px] aspect-[16/10] rounded-2xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35),0_0_0_1px_rgba(0,0,0,0.08)] bg-neutral-900">
         {/* Layered Crossfading Images */}
         {projects.map((proj, idx) => {
           const isActive = idx === activeIndex;

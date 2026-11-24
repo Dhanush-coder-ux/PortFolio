@@ -58,10 +58,10 @@ export default function EditorialProjectsSection() {
         isVisible={isHoveringList}
       />
 
-      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 md:pl-36 md:pr-10 lg:pl-48 lg:pr-12 relative z-10">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:pl-48 md:pr-10 lg:pl-64 lg:pr-16 relative z-10">
         {/* Section Introduction Header */}
         <div className="max-w-3xl mb-16 sm:mb-24 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/[0.04] border border-black/10 text-xs font-mono-tech tracking-wider uppercase text-neutral-600">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/[0.05] border border-black/15 text-xs font-mono-tech tracking-wider uppercase text-neutral-800 font-medium">
             <span>SELECTED WORK — 2026</span>
           </div>
 
@@ -69,7 +69,7 @@ export default function EditorialProjectsSection() {
             Things I&apos;ve built.
           </h2>
 
-          <p className="text-base sm:text-xl text-neutral-500 leading-relaxed font-light max-w-xl">
+          <p className="text-base sm:text-xl text-neutral-700 leading-relaxed font-light max-w-xl">
             A selection of software systems, applications and experiments I&apos;ve worked on.
           </p>
         </div>
@@ -77,7 +77,7 @@ export default function EditorialProjectsSection() {
         {/* Project List: Editorial Horizontal Rows */}
         <div
           ref={listRef}
-          className="border-t border-[#E5E5DF]"
+          className="border-t border-[#D0CFC8]"
           onMouseEnter={() => setIsHoveringList(true)}
           onMouseLeave={() => {
             setIsHoveringList(false);
@@ -105,32 +105,38 @@ export default function EditorialProjectsSection() {
                   setActiveProjectIndex(null);
                   setIsHoveringList(false);
                 }}
-                className="editorial-project-row group block py-8 sm:py-12 lg:py-14 border-b border-[#E5E5DF] transition-colors duration-300 relative focus:outline-none"
+                className="editorial-project-row group block py-8 sm:py-12 lg:py-14 border-b border-[#D0CFC8] transition-colors duration-300 relative focus:outline-none"
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
-                  {/* LEFT: Project Number & Oversized Title */}
-                  <div className="flex items-baseline gap-4 sm:gap-8">
-                    <span className="font-mono-tech text-sm sm:text-base text-neutral-400 group-hover:text-neutral-900 transition-colors duration-300 shrink-0 select-none">
+                  {/* LEFT: Project Number, Oversized Title & Description */}
+                  <div className="flex items-start gap-4 sm:gap-8 max-w-3xl">
+                    <span className="font-mono-tech text-sm sm:text-base text-neutral-500 group-hover:text-neutral-950 font-semibold transition-colors duration-300 shrink-0 select-none pt-1 sm:pt-2">
                       {project.number}
                     </span>
 
-                    <h3 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-[#8E8E89] group-hover:text-[#111111] transition-all duration-300 transform group-hover:translate-x-3 sm:group-hover:translate-x-5">
-                      {project.name}
-                    </h3>
+                    <div className="space-y-1 sm:space-y-2">
+                      <h3 className="font-display text-3xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-[#1A1A18] group-hover:text-[#000000] transition-all duration-300 transform group-hover:translate-x-3 sm:group-hover:translate-x-4">
+                        {project.name}
+                      </h3>
+
+                      <p className="text-xs sm:text-sm text-neutral-600 group-hover:text-neutral-800 font-light max-w-xl leading-relaxed">
+                        {project.description}
+                      </p>
+                    </div>
                   </div>
 
                   {/* RIGHT: Category, Tech & Arrow Icon */}
-                  <div className="flex items-center justify-between md:justify-end gap-6 sm:gap-10 md:text-right pl-8 md:pl-0">
+                  <div className="flex items-center justify-between md:justify-end gap-6 sm:gap-10 md:text-right pl-8 md:pl-0 shrink-0">
                     <div className="space-y-1">
-                      <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-neutral-500 group-hover:text-neutral-900 transition-colors duration-300">
+                      <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-neutral-700 group-hover:text-neutral-950 transition-colors duration-300">
                         {project.category}
                       </p>
-                      <p className="text-xs sm:text-sm font-mono-tech text-neutral-400 group-hover:text-neutral-700 transition-colors duration-300">
+                      <p className="text-xs sm:text-sm font-mono-tech text-neutral-600 group-hover:text-neutral-900 transition-colors duration-300">
                         {project.technologies}
                       </p>
                     </div>
 
-                    <div className="w-9 h-9 rounded-full border border-black/10 group-hover:border-black/30 group-hover:bg-[#111111] group-hover:text-white flex items-center justify-center text-neutral-400 transition-all duration-300 shrink-0">
+                    <div className="w-9 h-9 rounded-full border border-black/15 group-hover:border-black/40 group-hover:bg-[#111111] group-hover:text-white flex items-center justify-center text-neutral-500 transition-all duration-300 shrink-0">
                       <ArrowUpRight className="w-4 h-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                     </div>
                   </div>

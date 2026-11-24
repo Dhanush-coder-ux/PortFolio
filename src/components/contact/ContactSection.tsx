@@ -55,7 +55,7 @@ export default function ContactSection() {
     <section
       id="contact"
       ref={sectionRef}
-      className="relative py-28 sm:py-36 px-4 sm:px-6 md:pl-36 md:pr-10 lg:pl-48 lg:pr-12 max-w-[1400px] mx-auto border-t border-[#292D2B]/60"
+      className="relative py-28 sm:py-36 px-4 sm:px-6 md:pl-48 md:pr-10 lg:pl-64 lg:pr-12 max-w-[1440px] mx-auto border-t border-[#292D2B]/60"
     >
       {/* Ambient Radial Backlight */}
       <div

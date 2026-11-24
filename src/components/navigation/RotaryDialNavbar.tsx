@@ -97,32 +97,50 @@ export const NAV_SECTIONS: NavSection[] = [
 const RESUME_URL = "/images/Dhanush_Kumar_Resume_ATS.pdf";
 
 // ============================================================================
-// MATHEMATICALLY CALIBRATED DIAL RADIAL GEOMETRY
+// MATHEMATICALLY CALIBRATED DIAL RADIAL & ANGULAR GEOMETRY
 // Parent boundary: DIAL_RADIUS = 190px (Diameter: 380px, Center: 0, 0)
-// Safe Annular Range for items: [50px, 160px]
-// Everything stays strictly inside the circular perimeter with ample padding.
+//
+// Semicircular visible arc on desktop: [-90 deg, +90 deg] (X >= 0)
+// Safe angular envelope: [-78 deg, +78 deg]
+// 7 sections, ANGLE_STEP = 13.0 deg, MID_INDEX = 3 (Architecture at 0 deg)
+// Base angles: -39 deg to +39 deg (span = 78 deg).
+// Rotation range: -39 deg to +39 deg.
+// When Station 0 is at 0 deg stop: Station 6 is at +78 deg (cos(78) > 0, X > 0).
+// When Station 6 is at 0 deg stop: Station 0 is at -78 deg (cos(-78) > 0, X > 0).
+// RESULT: Every single station ALWAYS remains 100% visible, fully clickable,
+// and strictly inside the circular bezel boundary across all 7 selections!
 // ============================================================================
 const DIAL_RADIUS = 190;
-const HOLE_PITCH_RADIUS = 138; // Finger holes center radius
-const HOLE_RADIUS = 14.5;      // Finger hole radius (outer edge at 138 + 14.5 = 152.5px < 174px)
-const LABEL_RADIUS = 88;       // Navigation labels radius (comfortably inside at 88px)
-const ANGLE_STEP = 21;         // 21 deg between each adjacent section
-const MID_INDEX = 3;           // Section 3 (Architecture) sits at 0 deg when rotation is 0
+const HOLE_PITCH_RADIUS = 140; // Finger holes pitch circle radius
+const HOLE_RADIUS = 11.5;      // Finger hole radius
+const HOLE_CHAMFER_RADIUS = 13.5; // Outer brass chamfer ring radius
+const LABEL_EVEN_RADIUS = 96;  // Staggered radius for even indices (0, 2, 4, 6)
+const LABEL_ODD_RADIUS = 74;   // Staggered radius for odd indices (1, 3, 5)
+const ANGLE_STEP = 13.0;       // Angular step in degrees between adjacent stations
+const MID_INDEX = 3;           // Section 3 (Architecture) is center (0 deg)
 
 // Calculate base angle on the rotor disc for section i
-function getBaseAngle(index: number): number {
+export function getBaseAngle(index: number): number {
   return (index - MID_INDEX) * ANGLE_STEP;
 }
 
 // Target rotor rotation in degrees to bring section index to the 0 deg station
-function getTargetRotation(index: number): number {
+export function getTargetRotation(index: number): number {
   return -getBaseAngle(index);
 }
 
-// Convert current rotor rotation into the nearest section index
-function getIndexFromRotation(rotation: number): number {
+// Convert rotor rotation into the nearest section index
+export function getIndexFromRotation(rotation: number): number {
   const rawIdx = MID_INDEX - rotation / ANGLE_STEP;
   return Math.min(NAV_SECTIONS.length - 1, Math.max(0, Math.round(rawIdx)));
+}
+
+interface DragState {
+  pointerId: number;
+  prevAngle: number;
+  accumulatedRotation: number;
+  lastNearestIdx: number;
+  svgElement: SVGSVGElement;
 }
 
 export default function RotaryDialNavbar() {
@@ -138,17 +156,12 @@ export default function RotaryDialNavbar() {
   const [soundOn, setSoundOn] = useState<boolean>(true);
   const [mobileExpanded, setMobileExpanded] = useState<boolean>(false);
 
-  const svgRef = useRef<SVGSVGElement | null>(null);
   const dialContainerRef = useRef<HTMLDivElement | null>(null);
   const isInteractingRef = useRef<boolean>(false);
-  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const dragStartRef = useRef<{
-    pointerId: number;
-    startAngle: number;
-    initialRotation: number;
-    lastNearestIdx: number;
-  } | null>(null);
+  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dragStateRef = useRef<DragState | null>(null);
   const lastWheelTimeRef = useRef<number>(0);
+  const currentRotationRef = useRef<number>(getTargetRotation(0));
 
   useEffect(() => {
     setSoundOn(isRotarySoundEnabled());
@@ -167,7 +180,7 @@ export default function RotaryDialNavbar() {
       if (interactionTimeoutRef.current) clearTimeout(interactionTimeoutRef.current);
       interactionTimeoutRef.current = setTimeout(() => {
         isInteractingRef.current = false;
-      }, 900);
+      }, 700);
 
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -178,6 +191,7 @@ export default function RotaryDialNavbar() {
       const clamped = Math.min(NAV_SECTIONS.length - 1, Math.max(0, index));
       setActiveIndex(clamped);
       const targetRot = getTargetRotation(clamped);
+      currentRotationRef.current = targetRot;
       setDialRotation(targetRot);
       setDragRotation(targetRot);
       playMechanicalTick("snap");
@@ -192,7 +206,7 @@ export default function RotaryDialNavbar() {
   // IntersectionObserver to auto-track active section while user scrolls page
   useEffect(() => {
     const observerCallback: IntersectionObserverCallback = (entries) => {
-      if (isInteractingRef.current || isDragging) return;
+      if (isInteractingRef.current || dragStateRef.current !== null) return;
 
       let maxRatio = 0;
       let targetSectionId = "";
@@ -209,6 +223,7 @@ export default function RotaryDialNavbar() {
         if (foundIdx !== -1 && foundIdx !== activeIndex) {
           setActiveIndex(foundIdx);
           const newRot = getTargetRotation(foundIdx);
+          currentRotationRef.current = newRot;
           setDialRotation(newRot);
           setDragRotation(newRot);
         }
@@ -217,8 +232,8 @@ export default function RotaryDialNavbar() {
 
     const observer = new IntersectionObserver(observerCallback, {
       root: null,
-      rootMargin: "-20% 0px -40% 0px",
-      threshold: [0.1, 0.25, 0.5, 0.75],
+      rootMargin: "-15% 0px -25% 0px",
+      threshold: [0, 0.1, 0.25, 0.5, 0.75],
     });
 
     NAV_SECTIONS.forEach((section) => {
@@ -227,89 +242,118 @@ export default function RotaryDialNavbar() {
     });
 
     return () => observer.disconnect();
-  }, [activeIndex, isDragging]);
+  }, [activeIndex]);
 
-  // Pointer dragging handlers
+  // Robust pointer dragging engine with single source of truth
   const handlePointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
-    if (e.button !== 0) return;
-    const svgEl = svgRef.current;
-    if (!svgEl) return;
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+
+    const svgEl = e.currentTarget;
+    const rect = svgEl.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const startAngle =
+      Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
 
     try {
       svgEl.setPointerCapture(e.pointerId);
     } catch {
-      // Ignore
+      // In case pointer capture is unsupported in some environments
     }
 
-    const rect = svgEl.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
-
-    dragStartRef.current = {
+    const startRot = currentRotationRef.current;
+    dragStateRef.current = {
       pointerId: e.pointerId,
-      startAngle,
-      initialRotation: dialRotation,
+      prevAngle: startAngle,
+      accumulatedRotation: startRot,
       lastNearestIdx: activeIndex,
+      svgElement: svgEl,
     };
 
+    setDragRotation(startRot);
     setIsDragging(true);
     isInteractingRef.current = true;
     playMechanicalTick("click");
   };
 
   const handlePointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
-    if (!isDragging || !dragStartRef.current || !svgRef.current) return;
+    const drag = dragStateRef.current;
+    if (!drag || drag.pointerId !== e.pointerId) return;
 
-    const rect = svgRef.current.getBoundingClientRect();
+    const rect = drag.svgElement.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
+    const currentAngle =
+      Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
 
-    const currentAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
-    let delta = currentAngle - dragStartRef.current.startAngle;
+    // Continuous shortest-arc angular delta calculation
+    let delta = ((currentAngle - drag.prevAngle + 540) % 360) - 180;
+    drag.prevAngle = currentAngle;
 
-    while (delta > 180) delta -= 360;
-    while (delta < -180) delta += 360;
+    let computedRot = drag.accumulatedRotation + delta;
 
-    let computedRot = dragStartRef.current.initialRotation + delta;
+    // Bounded rotation with gentle spring resistance at extremes
+    const maxRot = getTargetRotation(0) + 10;
+    const minRot = getTargetRotation(NAV_SECTIONS.length - 1) - 10;
 
-    const maxRot = getTargetRotation(0) + 18;
-    const minRot = getTargetRotation(NAV_SECTIONS.length - 1) - 18;
+    let displayRot = computedRot;
     if (computedRot > maxRot) {
-      computedRot = maxRot + (computedRot - maxRot) * 0.25;
+      displayRot = maxRot + (computedRot - maxRot) * 0.2;
     } else if (computedRot < minRot) {
-      computedRot = minRot + (computedRot - minRot) * 0.25;
+      displayRot = minRot + (computedRot - minRot) * 0.2;
     }
 
-    setDragRotation(computedRot);
+    drag.accumulatedRotation = computedRot;
+    setDragRotation(displayRot);
 
-    const nearest = getIndexFromRotation(computedRot);
-    if (nearest !== dragStartRef.current.lastNearestIdx) {
-      dragStartRef.current.lastNearestIdx = nearest;
+    const nearest = getIndexFromRotation(displayRot);
+    if (nearest !== drag.lastNearestIdx) {
+      drag.lastNearestIdx = nearest;
       playMechanicalTick("ratchet");
     }
   };
 
   const handlePointerUp = (e: React.PointerEvent<SVGSVGElement>) => {
-    if (!isDragging) return;
+    const drag = dragStateRef.current;
+    if (!drag || drag.pointerId !== e.pointerId) return;
 
     try {
-      if (svgRef.current?.hasPointerCapture(e.pointerId)) {
-        svgRef.current.releasePointerCapture(e.pointerId);
+      if (drag.svgElement.hasPointerCapture(e.pointerId)) {
+        drag.svgElement.releasePointerCapture(e.pointerId);
       }
     } catch {
       // Ignore
     }
 
+    const finalRot = drag.accumulatedRotation;
+    dragStateRef.current = null;
     setIsDragging(false);
 
-    const snappedIdx = getIndexFromRotation(dragRotation);
+    const snappedIdx = getIndexFromRotation(finalRot);
     navigateToIndex(snappedIdx, true);
-    dragStartRef.current = null;
   };
 
-  // Mouse wheel rotation over dial
+  // Global window fallback listeners for pointer cancellation
+  useEffect(() => {
+    const handleGlobalCancel = () => {
+      if (dragStateRef.current) {
+        const finalRot = dragStateRef.current.accumulatedRotation;
+        dragStateRef.current = null;
+        setIsDragging(false);
+        const snappedIdx = getIndexFromRotation(finalRot);
+        navigateToIndex(snappedIdx, true);
+      }
+    };
+
+    window.addEventListener("pointerup", handleGlobalCancel);
+    window.addEventListener("pointercancel", handleGlobalCancel);
+    return () => {
+      window.removeEventListener("pointerup", handleGlobalCancel);
+      window.removeEventListener("pointercancel", handleGlobalCancel);
+    };
+  }, [navigateToIndex]);
+
+  // Mouse wheel rotation over dial disc
   useEffect(() => {
     const dialEl = dialContainerRef.current;
     if (!dialEl) return;
@@ -319,7 +363,7 @@ export default function RotaryDialNavbar() {
       e.stopPropagation();
 
       const now = Date.now();
-      if (now - lastWheelTimeRef.current < 170) return;
+      if (now - lastWheelTimeRef.current < 220) return;
       lastWheelTimeRef.current = now;
 
       if (e.deltaY > 10) {
@@ -363,7 +407,7 @@ export default function RotaryDialNavbar() {
 
   const springConfig: Transition = prefersReducedMotion
     ? { duration: 0.05 }
-    : { type: "spring", stiffness: 220, damping: 24, mass: 0.85 };
+    : { type: "spring", stiffness: 240, damping: 25, mass: 0.85 };
   const dragTransition: Transition = { duration: 0 };
 
   return (
@@ -372,7 +416,7 @@ export default function RotaryDialNavbar() {
         ========================================================================
         DESKTOP & TABLET: FIXED SEMICIRCULAR ROTARY DIAL (LEFT VIEWPORT EDGE)
         - Clean circular boundary of diameter 380px.
-        - Exactly 50% outside viewport (marginLeft: -190px).
+        - Center aligned with left viewport edge (marginLeft: -190px).
         - Every navigation item is strictly contained inside the dial circle.
         - Console is docked neatly beneath the bottom arc.
         ========================================================================
@@ -383,14 +427,13 @@ export default function RotaryDialNavbar() {
         role="navigation"
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        className="fixed left-0 top-1/2 -translate-y-1/2 z-50 pointer-events-none select-none hidden md:flex flex-col items-start outline-none focus-visible:ring-1 focus-visible:ring-[#E9B957]/50"
+        className="rotary-dial-navbar fixed left-0 top-1/2 -translate-y-1/2 z-50 pointer-events-none select-none hidden md:flex flex-col items-start outline-none focus-visible:ring-1 focus-visible:ring-[#E9B957]/50 max-h-screen py-2 overflow-visible"
       >
         {/* Main Dial Circular Boundary Container */}
         <div
-          className="pointer-events-auto relative cursor-grab active:cursor-grabbing touch-none origin-left md:scale-[0.80] lg:scale-100 transition-transform duration-300"
+          className="pointer-events-auto relative cursor-grab active:cursor-grabbing touch-none md:scale-[0.72] lg:scale-100 transition-transform duration-300"
           style={{
-            // Diameter 380px, radius 190px.
-            // Exactly 50% outside the viewport (x = -190 to +190px).
+            transformOrigin: "190px 190px",
             marginLeft: "-190px",
             width: "380px",
             height: "380px",
@@ -405,12 +448,8 @@ export default function RotaryDialNavbar() {
             }}
           />
 
-          {/* 
-            Strictly bounded SVG: viewBox="-190 -190 380 380"
-            Center is (0, 0), and overflow is clipped to the circle boundary.
-          */}
+          {/* Strictly bounded SVG: viewBox="-190 -190 380 380" */}
           <svg
-            ref={svgRef}
             viewBox="-190 -190 380 380"
             className="w-full h-full drop-shadow-[0_16px_45px_rgba(0,0,0,0.85)] filter"
             style={{ overflow: "hidden", borderRadius: "50%" }}
@@ -457,8 +496,8 @@ export default function RotaryDialNavbar() {
               </radialGradient>
 
               {/* Dial Boundary Protective Clip Path */}
-              <clipPath id="dialBoundary">
-                <circle cx="0" cy="0" r={DIAL_RADIUS} />
+              <clipPath id="dialBezelClip">
+                <circle cx="0" cy="0" r={DIAL_RADIUS - 6} />
               </clipPath>
             </defs>
 
@@ -551,6 +590,7 @@ export default function RotaryDialNavbar() {
               animate={{ rotate: activeRotation }}
               transition={isDragging ? dragTransition : springConfig}
               style={{ originX: "0px", originY: "0px" }}
+              clipPath="url(#dialBezelClip)"
             >
               {/* Rotor Structural Spoke Lines */}
               {Array.from({ length: 24 }).map((_, idx) => {
@@ -579,12 +619,13 @@ export default function RotaryDialNavbar() {
                 const rad = (baseAngle * Math.PI) / 180;
 
                 // Explicit polar coordinate calculation: x = cx + r*cos(a), y = cy + r*sin(a)
-                // Center is (0, 0)
                 const holeX = HOLE_PITCH_RADIUS * Math.cos(rad);
                 const holeY = HOLE_PITCH_RADIUS * Math.sin(rad);
 
-                const labelX = LABEL_RADIUS * Math.cos(rad);
-                const labelY = LABEL_RADIUS * Math.sin(rad);
+                // Staggered radii for perfect non-overlapping label layout
+                const labelRadius = idx % 2 === 0 ? LABEL_EVEN_RADIUS : LABEL_ODD_RADIUS;
+                const labelX = labelRadius * Math.cos(rad);
+                const labelY = labelRadius * Math.sin(rad);
 
                 const isActive = activeIndex === idx;
                 const isHovered = hoveredIndex === idx;
@@ -604,18 +645,18 @@ export default function RotaryDialNavbar() {
                     <line
                       x1={44 * Math.cos(rad)}
                       y1={44 * Math.sin(rad)}
-                      x2={(HOLE_PITCH_RADIUS - HOLE_RADIUS - 2) * Math.cos(rad)}
-                      y2={(HOLE_PITCH_RADIUS - HOLE_RADIUS - 2) * Math.sin(rad)}
+                      x2={(HOLE_PITCH_RADIUS - HOLE_CHAMFER_RADIUS - 2) * Math.cos(rad)}
+                      y2={(HOLE_PITCH_RADIUS - HOLE_CHAMFER_RADIUS - 2) * Math.sin(rad)}
                       stroke={isActive ? "#E9B957" : "#242927"}
                       strokeWidth={isActive ? 1.25 : 0.6}
                       strokeOpacity={isActive ? 0.75 : 0.35}
                     />
 
-                    {/* Finger Hole Outer Chamfer Ring (r: 138px, outer edge 152.5px) */}
+                    {/* Finger Hole Outer Chamfer Ring */}
                     <circle
                       cx={holeX}
                       cy={holeY}
-                      r={HOLE_RADIUS + 2}
+                      r={HOLE_CHAMFER_RADIUS}
                       fill="none"
                       stroke={
                         isActive
@@ -643,16 +684,16 @@ export default function RotaryDialNavbar() {
                       <circle
                         cx={holeX}
                         cy={holeY}
-                        r={HOLE_RADIUS - 2}
+                        r={HOLE_RADIUS - 1.5}
                         fill="none"
                         stroke="#E9B957"
                         strokeWidth="1"
-                        strokeOpacity="0.5"
+                        strokeOpacity="0.6"
                         strokeDasharray="2 2"
                       />
                     )}
 
-                    {/* Upright Section Number (Counter-rotated for constant upright legibility) */}
+                    {/* Upright Section Number inside Finger Hole */}
                     <g
                       transform={`translate(${holeX}, ${holeY}) rotate(${-activeRotation})`}
                     >
@@ -660,10 +701,10 @@ export default function RotaryDialNavbar() {
                         textAnchor="middle"
                         dominantBaseline="central"
                         fill={isActive ? "#E9B957" : isHovered ? "#F5F2E9" : "#808582"}
-                        fontSize="10.5"
+                        fontSize="9.5"
                         fontWeight="700"
                         fontFamily="JetBrains Mono, monospace"
-                        letterSpacing="0.04em"
+                        letterSpacing="0.02em"
                         className="transition-colors duration-200"
                       >
                         {section.indexStr}
@@ -672,8 +713,8 @@ export default function RotaryDialNavbar() {
 
                     {/* 
                       Internal Navigation Menu Label:
-                      Positioned at LABEL_RADIUS = 88px (Strictly inside safe annular band).
-                      Distance from center is 88px, leaving over 90px of internal padding from boundary.
+                      Positioned at staggered radii (96px even / 74px odd) strictly inside safe annular band.
+                      Counter-rotated for constant upright legibility.
                       Zero text overflow or clipping!
                     */}
                     <g
@@ -683,7 +724,7 @@ export default function RotaryDialNavbar() {
                         textAnchor="middle"
                         dominantBaseline="central"
                         fill={isActive ? "#E9B957" : isHovered ? "#F5F2E9" : "#6E7471"}
-                        fontSize="8"
+                        fontSize="7.5"
                         fontWeight={isActive ? "700" : "600"}
                         fontFamily="Space Grotesk, Inter, sans-serif"
                         letterSpacing="0.08em"
@@ -700,10 +741,10 @@ export default function RotaryDialNavbar() {
               <g transform="rotate(72)">
                 <text
                   x="0"
-                  y="-62"
+                  y="-58"
                   textAnchor="middle"
                   fill="#2A302D"
-                  fontSize="6"
+                  fontSize="5.5"
                   fontFamily="JetBrains Mono, monospace"
                   letterSpacing="0.2em"
                 >
@@ -718,11 +759,11 @@ export default function RotaryDialNavbar() {
             <g transform="translate(0, 0)">
               {/* Classic Brass Finger Stop Arm */}
               <path
-                d={`M ${HOLE_PITCH_RADIUS - HOLE_RADIUS - 4} -9 
-                   L ${HOLE_PITCH_RADIUS + HOLE_RADIUS + 7} -9 
-                   L ${HOLE_PITCH_RADIUS + HOLE_RADIUS + 12} 0 
-                   L ${HOLE_PITCH_RADIUS + HOLE_RADIUS + 7} 9 
-                   L ${HOLE_PITCH_RADIUS - HOLE_RADIUS - 4} 9 
+                d={`M ${HOLE_PITCH_RADIUS - HOLE_CHAMFER_RADIUS - 3} -8 
+                   L ${HOLE_PITCH_RADIUS + HOLE_CHAMFER_RADIUS + 6} -8 
+                   L ${HOLE_PITCH_RADIUS + HOLE_CHAMFER_RADIUS + 11} 0 
+                   L ${HOLE_PITCH_RADIUS + HOLE_CHAMFER_RADIUS + 6} 8 
+                   L ${HOLE_PITCH_RADIUS - HOLE_CHAMFER_RADIUS - 3} 8 
                    Z`}
                 fill="#0D0F0E"
                 stroke="#E9B957"
@@ -732,15 +773,15 @@ export default function RotaryDialNavbar() {
 
               {/* Precision Stop Needle */}
               <polygon
-                points={`${HOLE_PITCH_RADIUS - HOLE_RADIUS - 6},0 ${
-                  HOLE_PITCH_RADIUS - HOLE_RADIUS - 1
-                },-3.5 ${HOLE_PITCH_RADIUS - HOLE_RADIUS - 1},3.5`}
+                points={`${HOLE_PITCH_RADIUS - HOLE_CHAMFER_RADIUS - 5},0 ${
+                  HOLE_PITCH_RADIUS - HOLE_CHAMFER_RADIUS - 1
+                },-3 ${HOLE_PITCH_RADIUS - HOLE_CHAMFER_RADIUS - 1},3`}
                 fill="#E9B957"
               />
 
               {/* Active Indicator Lamp Pip */}
               <circle
-                cx={HOLE_PITCH_RADIUS + HOLE_RADIUS + 9}
+                cx={HOLE_PITCH_RADIUS + HOLE_CHAMFER_RADIUS + 8}
                 cy="0"
                 r="2.5"
                 fill="#E9B957"
@@ -835,22 +876,22 @@ export default function RotaryDialNavbar() {
         {/* 
           --------------------------------------------------------------------
           STATION READOUT CONSOLE DOCKED DIRECTLY UNDERNEATH DIAL
-          Bounded at width 175px: perfectly contained within left gutter.
+          Responsive width and positioning ensures zero overlap with page content.
           --------------------------------------------------------------------
         */}
-        <div className="pointer-events-auto pl-3 -mt-5">
+        <div className="pointer-events-auto pl-2.5 lg:pl-3 -mt-6 sm:-mt-5">
           <motion.div
             layout
-            className="bg-[#080909]/95 backdrop-blur-xl border border-[#292D2B] rounded-xl p-2.5 w-[175px] shadow-[0_12px_36px_rgba(0,0,0,0.7)] text-left relative overflow-hidden"
+            className="bg-[#080909]/95 backdrop-blur-xl border border-[#292D2B] rounded-xl p-2 lg:p-2.5 w-[142px] lg:w-[175px] shadow-[0_12px_36px_rgba(0,0,0,0.7)] text-left relative overflow-hidden"
           >
             {/* Top Gold Accent */}
             <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-[#E9B957]/70 via-[#E9B957]/30 to-transparent" />
 
             {/* Header: Station Code & Sound Toggle */}
-            <div className="flex items-center justify-between gap-1 mb-1.5 pb-1.5 border-b border-[#1E2321]">
+            <div className="flex items-center justify-between gap-1 mb-1 lg:mb-1.5 pb-1 lg:pb-1.5 border-b border-[#1E2321]">
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#E9B957] animate-pulse" />
-                <span className="font-mono-tech text-[9.5px] tracking-wider text-[#A5A7A2] uppercase">
+                <span className="font-mono-tech text-[8.5px] lg:text-[9.5px] tracking-wider text-[#A5A7A2] uppercase">
                   {currentSection.code}
                 </span>
               </div>
@@ -871,41 +912,32 @@ export default function RotaryDialNavbar() {
             </div>
 
             {/* Section Name Display */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSection.id}
-                initial={{ opacity: 0, y: 3 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -3 }}
-                transition={{ duration: 0.15 }}
-                className="space-y-0.5"
-              >
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-mono-tech text-[11px] font-bold text-[#E9B957]">
-                    {currentSection.indexStr}
-                  </span>
-                  <h3 className="font-display text-sm font-bold text-[#F5F2E9] tracking-tight truncate">
-                    {currentSection.label}
-                  </h3>
-                </div>
+            <div className="space-y-0.5">
+              <div className="flex items-baseline gap-1 lg:gap-1.5">
+                <span className="font-mono-tech text-[10px] lg:text-[11px] font-bold text-[#E9B957]">
+                  {currentSection.indexStr}
+                </span>
+                <h3 className="font-display text-xs lg:text-sm font-bold text-[#F5F2E9] tracking-tight truncate">
+                  {currentSection.label}
+                </h3>
+              </div>
 
-                <p className="font-mono-tech text-[8.5px] text-[#868A88] tracking-wide uppercase truncate">
-                  {currentSection.subtitle}
-                </p>
-              </motion.div>
-            </AnimatePresence>
+              <p className="font-mono-tech text-[8px] lg:text-[8.5px] text-[#868A88] tracking-wide uppercase truncate">
+                {currentSection.subtitle}
+              </p>
+            </div>
 
             {/* Steppers & Resume Action */}
-            <div className="mt-2 pt-2 border-t border-[#1E2321] flex items-center justify-between gap-1.5">
-              <div className="flex items-center gap-1">
+            <div className="mt-1.5 lg:mt-2 pt-1.5 lg:pt-2 border-t border-[#1E2321] flex items-center justify-between gap-1">
+              <div className="flex items-center gap-0.5 lg:gap-1">
                 <button
                   type="button"
                   disabled={activeIndex <= 0}
                   onClick={() => navigateToIndex(activeIndex - 1, true)}
                   aria-label="Previous section"
-                  className="p-1 rounded bg-[#121514] border border-[#252A28] text-[#A5A7A2] hover:text-[#F5F2E9] hover:border-[#E9B957]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="p-0.5 lg:p-1 rounded bg-[#121514] border border-[#252A28] text-[#A5A7A2] hover:text-[#F5F2E9] hover:border-[#E9B957]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
-                  <ChevronUp className="w-3 h-3" />
+                  <ChevronUp className="w-2.5 h-2.5 lg:w-3 lg:h-3" />
                 </button>
 
                 <button
@@ -913,12 +945,12 @@ export default function RotaryDialNavbar() {
                   disabled={activeIndex >= NAV_SECTIONS.length - 1}
                   onClick={() => navigateToIndex(activeIndex + 1, true)}
                   aria-label="Next section"
-                  className="p-1 rounded bg-[#121514] border border-[#252A28] text-[#A5A7A2] hover:text-[#F5F2E9] hover:border-[#E9B957]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="p-0.5 lg:p-1 rounded bg-[#121514] border border-[#252A28] text-[#A5A7A2] hover:text-[#F5F2E9] hover:border-[#E9B957]/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
-                  <ChevronDown className="w-3 h-3" />
+                  <ChevronDown className="w-2.5 h-2.5 lg:w-3 lg:h-3" />
                 </button>
 
-                <span className="text-[9px] font-mono-tech text-[#5A5F5D] pl-0.5">
+                <span className="text-[8px] lg:text-[9px] font-mono-tech text-[#5A5F5D] pl-0.5">
                   {activeIndex + 1}/7
                 </span>
               </div>
@@ -927,7 +959,7 @@ export default function RotaryDialNavbar() {
                 href={RESUME_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E9B957] text-[#080909] text-[9.5px] font-semibold hover:bg-[#F5D076] transition-colors shadow-sm"
+                className="inline-flex items-center gap-0.5 lg:gap-1 px-1.5 lg:px-2 py-0.5 rounded-full bg-[#E9B957] text-[#080909] text-[8.5px] lg:text-[9.5px] font-semibold hover:bg-[#F5D076] transition-colors shadow-sm"
                 title="Download ATS Resume"
               >
                 <FileText className="w-2.5 h-2.5 stroke-[2.5]" />
@@ -1071,8 +1103,9 @@ export default function RotaryDialNavbar() {
                       const rad = (baseAngle * Math.PI) / 180;
                       const holeX = HOLE_PITCH_RADIUS * Math.cos(rad);
                       const holeY = HOLE_PITCH_RADIUS * Math.sin(rad);
-                      const labelX = LABEL_RADIUS * Math.cos(rad);
-                      const labelY = LABEL_RADIUS * Math.sin(rad);
+                      const labelRadius = idx % 2 === 0 ? LABEL_EVEN_RADIUS : LABEL_ODD_RADIUS;
+                      const labelX = labelRadius * Math.cos(rad);
+                      const labelY = labelRadius * Math.sin(rad);
                       const isActive = activeIndex === idx;
 
                       return (
@@ -1087,7 +1120,7 @@ export default function RotaryDialNavbar() {
                           <circle
                             cx={holeX}
                             cy={holeY}
-                            r={HOLE_RADIUS + 1.5}
+                            r={HOLE_CHAMFER_RADIUS}
                             fill="#080909"
                             stroke={isActive ? "#E9B957" : "#3D4441"}
                             strokeWidth={isActive ? 1.75 : 1}
@@ -1099,7 +1132,7 @@ export default function RotaryDialNavbar() {
                               textAnchor="middle"
                               dominantBaseline="central"
                               fill={isActive ? "#E9B957" : "#A5A7A2"}
-                              fontSize="11"
+                              fontSize="10"
                               fontWeight="bold"
                               fontFamily="JetBrains Mono, monospace"
                             >
@@ -1114,7 +1147,7 @@ export default function RotaryDialNavbar() {
                               textAnchor="middle"
                               dominantBaseline="central"
                               fill={isActive ? "#E9B957" : "#7A807D"}
-                              fontSize="8"
+                              fontSize="7.5"
                               fontWeight={isActive ? "700" : "600"}
                               fontFamily="Space Grotesk, sans-serif"
                             >

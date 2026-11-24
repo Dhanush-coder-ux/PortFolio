@@ -67,7 +67,7 @@ export default function HeroSection() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative min-h-[92vh] sm:min-h-screen flex flex-col justify-center pt-24 sm:pt-28 pb-16 sm:pb-24 px-4 sm:px-8 md:pl-36 md:pr-10 lg:pl-48 lg:pr-16 max-w-[1440px] mx-auto overflow-hidden"
+      className="relative min-h-[92vh] sm:min-h-screen flex flex-col justify-center pt-24 sm:pt-28 pb-16 sm:pb-24 px-4 sm:px-8 md:pl-48 md:pr-10 lg:pl-64 lg:pr-16 max-w-[1440px] mx-auto overflow-hidden"
     >
       {/* Subtle Ambient Radial Lighting */}
       <div

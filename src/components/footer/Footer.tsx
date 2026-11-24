@@ -8,8 +8,8 @@ export default function Footer() {
   };
 
   return (
-    <footer className="border-t border-[#292D2B] bg-[#080909] py-12 px-4 sm:px-6 md:pl-36 md:pr-10 lg:pl-48 lg:pr-12">
-      <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs font-mono-tech text-[#A5A7A2]">
+    <footer className="border-t border-[#292D2B] bg-[#080909] py-12 px-4 sm:px-6 md:pl-48 md:pr-10 lg:pl-64 lg:pr-12">
+      <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs font-mono-tech text-[#A5A7A2]">
         <div className="flex items-center gap-3">
           <div className="w-6 h-6 rounded-full bg-[#101312] border border-[#292D2B] flex items-center justify-center text-[10px] font-bold text-[#E8B95C]">
             DK
